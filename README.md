@@ -14,3 +14,5 @@ Sophia is a research technician at UC Santa Barbara, utilizing the NCEAS coreR C
 - Raw data is too large to be added into GitHub. Download from the link located in the source tab.
 
 ## Source
+- [Giant Kelp Frond Density](https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-sbc.112.12): Version 12, Data Entity 2.
+- [Giant Kelp Frond Number](https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-sbc.178.2): Version 2.
