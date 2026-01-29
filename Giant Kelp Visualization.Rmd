@@ -1,0 +1,117 @@
+---
+title: "Giant Kelp Data GitHub"
+author: "Sophia Cabral"
+date: "2026-01-29"
+output: 
+ prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+```
+
+```{r Giant Kelp Frond Density, include=TRUE}
+
+#Rassweiler, A, S. Harrer, D. Reed, C. Nelson, R. Miller. 2025. SBC LTER: REEF: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California ver 12. Environmental Data Initiative. https://doi.org/10.6073/pasta/dada6c601ee22da68fa79e912dd22d89. Accessed 2026-01-29.
+
+#Utilized Data Entery/Table 2: Macrocystis pyrifera standing crop, plant density, and loss rates with SE. 
+
+fronddens <- read.csv("fronddensity.csv")
+
+filtered_data <- fronddens %>%
+  filter(Site %in% c("AQUE", "MOHK"))
+
+averaged_data <- filtered_data %>%
+  group_by(date, Site) %>%
+  summarize(avg_fronds = mean(Frond_density, na.rm = TRUE), .groups = 'drop')
+  
+
+averaged_data$date <- as.Date(averaged_data$date)
+
+#For visualizing specific MHW years
+shading_data <- data.frame(
+  xmin = as.Date(c("2004-01-01", "2013-01-01", "2014-01-01", "2015-01-01", "2016-01-01", "2018-01-01", "2020-01-01", "2022-01-01")),
+  xmax = as.Date(c("2004-12-31", "2013-12-31", "2014-12-31", "2015-12-31", "2016-12-31", "2018-12-31", "2020-12-31","2022-12-31"))
+)
+
+
+kelp_frond_density <- ggplot(averaged_data, aes(x = date, y = avg_fronds, color = Site)) + 
+  geom_point(size = 1.75) +   
+  geom_line() +
+  #geom_smooth(method = "loess", se = FALSE, linewidth = 1.5) +   
+  labs(title = "Giant Kelp Average Frond Density",
+       x = "Date",
+       y = "Frond density (no./m²)",
+       color = "Site") +   
+  theme_minimal() +   
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year",  
+               limits = as.Date(c("2008-01-01", NA))) +  
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),   
+    plot.title = element_text(hjust = 0.5),   
+    legend.position = c(0.9, 0.9),   
+    legend.background = element_rect(fill = "white")   
+  ) +  
+  scale_color_manual(
+    values = c("AQUE" = "#F0CC02", "MOHK" = "#EE5E00"),   
+    labels = c("AQUE" = "Arroyo Quemado Beach", "MOHK" = "Mohawk Reef")   
+  ) +
+  geom_rect(data = shading_data, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf), 
+            fill = "#DA6113", alpha = 0.15, color = NA, inherit.aes = FALSE)
+
+
+kelp_frond_density
+
+#ggsave("giant kelp frond density.jpg", kelp_frond_density, width = 14, height = 6)
+
+```
+
+```{r Giant Kelp Frond Abundance, include=TRUE}
+#Reed, D, R. Miller. 2025. SBC LTER: Reef: Seasonal Kelp Forest Community Dynamics: Abundance and size of Giant Kelp ver 2. Environmental Data Initiative. https://doi.org/10.6073/pasta/387497d5319cf8d539226e5b3f9b16ae. Accessed 2026-01-29.
+
+
+SBS <- read.csv("SBSKELP.csv")
+
+filtered_data <- SBS %>%
+  filter(SITE %in% c("AQUE", "MOHK") & COMMON_NAME == "Giant Kelp")
+
+averaged_data <- filtered_data %>%
+  group_by(DATE, SITE) %>%
+  summarize(avg_fronds = mean(FRONDS, na.rm = TRUE), .groups = 'drop')
+
+averaged_data$DATE <- as.Date(averaged_data$DATE)
+
+kelp_frond_number <- ggplot(averaged_data, aes(x = DATE, y = avg_fronds, color = SITE)) + 
+  geom_point(size = 1.75) +   
+  geom_line() +
+  labs(title = "Giant Kelp Average Frond Number",
+       x = "Date",
+       y = "Fronds (number)",
+       color = "Site") +   
+  theme_minimal() +   
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year",  
+               limits = as.Date(c("2008-01-01", NA))) +  
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),   
+    plot.title = element_text(hjust = 0.5),   
+    legend.position = c(0.9, 0.9),   
+    legend.background = element_rect(fill = "white")   
+  ) +  
+  scale_color_manual(
+    values = c("AQUE" = "#F0CC02", "MOHK" = "#EE5E00"),   
+    labels = c("AQUE" = "Arroyo Quemado Beach", "MOHK" = "Mohawk Reef")   
+  ) +
+  geom_rect(data = shading_data, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf), 
+            fill = "#DA6113", alpha = 0.15, color = NA, inherit.aes = FALSE)
+
+
+kelp_frond_number
+
+#ggsave("giant kelp frond number.jpg", kelp_frond_number, width = 14, height = 6)
+  
+```
