@@ -19,7 +19,7 @@ library(tidyverse)
 
 #Rassweiler, A, S. Harrer, D. Reed, C. Nelson, R. Miller. 2025. SBC LTER: REEF: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California ver 12. Environmental Data Initiative. https://doi.org/10.6073/pasta/dada6c601ee22da68fa79e912dd22d89. Accessed 2026-01-29.
 
-#Utilized Data Entery/Table 2: Macrocystis pyrifera standing crop, plant density, and loss rates with SE. 
+#Utilized Data Entry/Table 2: Macrocystis pyrifera standing crop, plant density, and loss rates with SE. 
 
 fronddens <- read.csv("fronddensity.csv")
 
@@ -58,7 +58,7 @@ kelp_frond_density <- ggplot(averaged_data, aes(x = date, y = avg_fronds, color 
     legend.background = element_rect(fill = "white")   
   ) +  
   scale_color_manual(
-    values = c("AQUE" = "#F0CC02", "MOHK" = "#EE5E00"),   
+    values = c("AQUE" = "#DBDBDB", "MOHK" = "#818589"),   
     labels = c("AQUE" = "Arroyo Quemado Beach", "MOHK" = "Mohawk Reef")   
   ) +
   geom_rect(data = shading_data, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf), 
@@ -103,7 +103,7 @@ kelp_frond_number <- ggplot(averaged_data, aes(x = DATE, y = avg_fronds, color =
     legend.background = element_rect(fill = "white")   
   ) +  
   scale_color_manual(
-    values = c("AQUE" = "#F0CC02", "MOHK" = "#EE5E00"),   
+    values = c("AQUE" = "#DBDBDB", "MOHK" = "#818589"),   
     labels = c("AQUE" = "Arroyo Quemado Beach", "MOHK" = "Mohawk Reef")   
   ) +
   geom_rect(data = shading_data, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf), 
@@ -114,4 +114,61 @@ kelp_frond_number
 
 #ggsave("giant kelp frond number.jpg", kelp_frond_number, width = 14, height = 6)
   
+```
+
+```{r Frond Density 2022-2026, include=TRUE}
+#Reed, D, R. Miller. 2025. SBC LTER: Reef: Seasonal Kelp Forest Community Dynamics: Abundance and size of Giant Kelp ver 2. Environmental Data Initiative. https://doi.org/10.6073/pasta/387497d5319cf8d539226e5b3f9b16ae. Accessed 2026-01-29.
+
+#Utilized Data Entry/Table 6: Plant frond number and size. 
+
+frond_number <- read.csv("plantfrond.csv")
+
+filtered_data <- frond_number %>%
+  filter(SITE %in% c("AQUE", "MOHK")) %>%
+  filter(F_1M != "-99999")
+
+
+averaged_data <- filtered_data %>%
+  group_by(DATE, SITE) %>%
+  summarize(avg_fronds = mean(F_1M, na.rm = TRUE), .groups = 'drop')
+  
+
+averaged_data$DATE <- as.Date(averaged_data$DATE)
+
+frond_number <- ggplot(averaged_data, aes(x = DATE, y = avg_fronds, color = SITE)) + 
+  geom_point(size = 1.75) +   
+  geom_line() +
+  labs(
+       x = "Date",
+       y = "Number of Fronds",
+       color = "Site") +   
+  theme_minimal() +  
+  scale_x_date(
+  labels = function(x) format(x, "%b %Y"),
+  breaks = seq(as.Date("2022-09-01"),
+               as.Date("2025-12-31"),
+               by = "2 month"),
+  limits = c(as.Date("2022-09-01"),
+            as.Date("2025-12-31")),
+  expand = expansion(mult = c(0, 0))
+) +
+  scale_y_continuous(limits = c(0, 50)) +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "gray", linewidth = 0.5),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    plot.title = element_text(hjust = 0.5, size = 14, margin = margin(b = 20)),
+    axis.text.x = element_text(angle = 35, hjust = 1)
+  ) +
+  scale_color_manual(
+    values = c("AQUE" = "#DBDBDB", "MOHK" = "#818589"),   
+    labels = c("AQUE" = "Arroyo Quemado Reef", "MOHK" = "Mohawk Reef")   
+  ) 
+
+
+frond_number
+
+#ggsave("frond number short.jpg", frond_number, width = 14, height = 6)
 ```
